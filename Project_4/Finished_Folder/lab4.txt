@@ -1,0 +1,162 @@
+//CS 35L - Professor Eggert
+//Lab 4 - TA Isha Verma
+//Project 4 - C programming and debugging
+//lab4.txt
+
+- To begin this lab, I signed onto the SEASNet Server via my terminal:
+
+$ ssh [username]@lnxsrv09.seas.ucla.edu
+[password]
+
+- Once on the SEASNet Server, I downloaded coreutils-7.6 into the home 
+  directory via wget:
+
+$ wget http://web.cs.ucla.edu/classes/winter17/cs35L/assign/coreutils-with-bug.tar.gz
+
+- I then untarred and unzipped the file:
+
+$ tar -xzvf coreutils-with-bug.tar.gz
+
+- Next, I changed into the coreutils directory to configure:
+
+$ ./configure
+
+- I then used the make command, but after doing so, encountered an error message:
+
+$ make
+
+In file included from utimecmp.c:41:0:
+utimens.h:2:5: error: conflicting types for 'futimens'
+ int futimens (int, char const *, struct timespec const [2]);
+     ^~~~~~~~
+In file included from utimecmp.h:25:0,
+                 from utimecmp.c:25:
+/usr/include/sys/stat.h:373:12: note: previous declaration of 'futimens' was here
+ extern int futimens (int __fd, const struct timespec __times[2]) __THROW;
+            ^~~~~~~~
+make[3]: *** [Makefile:659: utimecmp.o] Error 1
+make[3]: Leaving directory '/w/home.15/cs/ugrad/less/coreutils-with-bug/lib'
+make[2]: *** [Makefile:414: all] Error 2
+make[2]: Leaving directory '/w/home.15/cs/ugrad/less/coreutils-with-bug/lib'
+make[1]: *** [Makefile:419: all-recursive] Error 1
+make[1]: Leaving directory '/w/home.15/cs/ugrad/less/coreutils-with-bug'
+make: *** [Makefile:357: all] Error 2
+
+- As we were told that this version had a bug with its implementation of the ls
+  program, this error was to be expected. Now, to go about fixing the error, I 
+  downloaded the renaming patch via wget, while staying in the current directory:
+
+$ wget http://web.cs.ucla.edu/classes/winter17/cs35L/assign/coreutils.diff
+
+- To apply the patch, I used the patch command with the coreutils.diff, and then
+  recompiled via make:
+
+$ patch -p0 < coreutils.diff
+$ make
+
+- This patch fixed the bug, and no error message was produced as a result. The reason
+  that the patch fixed the problem was because it changed the futimens function to
+  coreutils_futimens and the calls to the function as well.
+
+- The example was then followed to create a temporary directory to reproduce the 
+  bug when ls -t mishandles files with very old time stamps:
+
+$ tmp=$(mktemp -d)
+$ cd $tmp
+$ touch -d '1918-11-11 11:00 GMT' wwi-armistice
+$ touch now
+$ sleep 1
+$ touch now1
+$ TZ=UTC0 ~/coreutils-with-bug/src/ls -lt --full-time wwi-armistice now now1
+
+-rw-r--r-- 1 less csugrad 0 1918-11-11 11:00:00.000000000 +0000 wwi-armistice
+-rw-r--r-- 1 less csugrad 0 2017-02-09 06:07:55.564965124 +0000 now1
+-rw-r--r-- 1 less csugrad 0 2017-02-09 06:07:52.929922472 +0000 now
+
+- As can be seen above, the bug clearly mishandled the file with the older time stamp
+
+- Now in order to find the bug causing the problem, I used GDB while still in the 
+  tmp directory:
+
+$ gdb ~/coreutils-with-bug/src/ls
+
+- As it was seen previously that the error function was due to a specific function,
+  I used info functions to try to pinpoint the function causing the bug:
+
+(gdb) info functions
+
+- Scrolling through the list of functions, I located ls.c, and came across a 
+  function called compare_mtime, which could potentially be the source of the 
+  problem as the time stamps were being displayed in the incorrect order. I set
+  a breakpoint at compare_mtimes
+
+(gdb) break compare_mtime
+Breakpoint 1 at 0x406dd0: compare_mtime. (2 locations)
+
+- I then ran the option to get the program going, and then stepped into the function:
+
+(gdb) r -lt --full-time wwi-armistice now now1
+
+- After stepping through twice, I came across a function of interest:
+
+(gdb) si
+
+timespec_cmp (b=..., a=...) at ../lib/timespec.h:48
+
+(gdb) list
+
+/* Return negative, zero, positive if A < B, A == B, A > B, respectively.
+44	   Assume the nanosecond components are in range, or close to it.  */
+45	static inline int
+46	timespec_cmp (struct timespec a, struct timespec b)
+47	{
+48	  int diff = a.tv_sec - b.tv_sec;
+49	  return diff ? diff : a.tv_nsec - b.tv_nsec;
+50	}
+
+- Looking at how this function is implemented, I believe that the bug could have 
+  occurred due to the possibility of integer overflow. The line that takes the 
+  difference of the two variables yields the chance that overflow could occur if
+  a.tv_sec is much smaller than b.tv_sec, and wrap-around occurs. 
+
+- Now, with a possible solution on how to correct the bug, I quit the gdb session, 
+  and then created a diff file of the timespec.h, where the function resided in:
+
+	- To do this, I used the diff command with the -u option on the timespec.h
+  	  files from the coreutils directory before and after the patch:
+	- Note that the modified timespec.h was on my Desktop, and the old version
+	  was in the coreutils-with-bug directory:
+
+$ diff -u ~/Desktop/timespec.h coreutils-with-bug/lib/timespec.h > lab4.diff
+
+- I then created a changelog entry and appended it to my diff file:
+
+$ emacs
+(emacs) C-x 4-a
+
+- Lastly, I reproduced the bug in my home directory on the SEASnet server using the
+  same method as before:
+
+touch -d '1918-11-11 11:00 GMT' wwi-armistice
+touch now
+sleep 1
+touch now1
+TZ=UTC0 ls -lt --full-time wwi-armistice now now1
+
+- The following was output as a result: 
+
+-rw-r--r-- 1 less csugrad 0 2054-12-17 17:28:16.000000000 +0000 wwi-armistice
+-rw-r--r-- 1 less csugrad 0 2017-02-09 07:25:29.631652000 +0000 now1
+-rw-r--r-- 1 less csugrad 0 2017-02-09 07:25:26.834398000 +0000 now
+
+- As shown, the timestamp for the www-armistice file was changed to way in the 
+  future, instead of the 1918 year that it was created with. The reason that the 
+  date was changed is due to how the SEASnet system and the Local File system 
+  represent time stamps. The SEASnet server uses unsigned 32-bit, while the Local
+  File system uses signed 32-bit. In addition to this difference, the Unix Epoch
+  began in 1970, but the www-armistice file has a date of 1918. Because of it being
+  before the UNIX Epoch, a 64-bit extension gets added to it, which led to the 
+  year being 2054.
+
+
+
