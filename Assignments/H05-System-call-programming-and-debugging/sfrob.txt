@@ -1,0 +1,162 @@
+//CS 35L - Professor Eggert
+//Lab 4 - TA Isha Verma
+//Project 5 - System call programming and debugging
+//Laboratory - Buffered versus unbuffered I/O
+//sfrob.txt
+
+- This text file consists of using the time command to compare the overall performances
+  of sfrob, sfrobu, sfrobs, sfrobu -f, and sfrobs -f
+- I ran these programs with inputs of varying numbers of input lines as requested
+  - To do so, I created a file called test.txt which consisted of the line:
+
+There was a dachshund named Charlie. He was a cool little dude and liked belly rubs.
+
+- I then created 4 files consisting of the line above written 20, 200, 2000, and 20000
+ times (each on a separate line):
+
+test1.txt
+$ time ./sfrob < test1.txt (20 lines)
+real	0m0.004s
+user	0m0.000s
+sys	0m0.001s
+
+$time ./sfrobu < test1.txt
+real  0m0.006s
+user  0m0.001s
+sys   0m0.002s
+
+$time ./sfrobs < test1.txt
+real  0m0.014s
+user  0m0.010s
+sys   0m0.011s
+
+$time ./sfrobu -f < test1.txt
+real  0m0.006s
+user  0m0.001s
+sys   0m0.003s
+
+$time ./sfrobs -f < test1.txt
+real  0m0.014s
+user  0m0.011s
+sys   0m0.010s
+
+===
+
+test2.txt
+$ time ./sfrob < test2.txt (200 lines)
+real   0m0.005s
+user   0m0.000s
+sys    0m0.002s
+
+$time ./sfrobu < test2.txt
+real  0m0.007s
+user  0m0.001s
+sys   0m0.003s
+
+$time ./sfrobs < test2.txt
+real  0m0.040s
+user  0m0.035s
+sys   0m0.012s
+
+$time ./sfrobu -f < test2.txt
+real  0m0.007s
+user  0m0.001s
+sys   0m0.003s
+
+$time ./sfrobs -f < test2.txt
+real  0m0.052s
+user  0m0.046s
+sys   0m0.013s
+
+===
+
+test3.txt
+$time ./sfrob < test3.txt (2000 lines)
+real  0m0.003s
+user  0m0.000s
+sys   0m0.002s
+
+$time ./sfrobu < test3.txt
+real  0m0.010s
+user  0m0.002s
+sys   0m0.003s
+
+$time ./sfrobs < test3.txt
+real  0m0.338s
+user  0m0.320s
+sys   0m0.023s
+
+$time ./sfrobu -f < test3.txt
+real  0m0.008s
+user  0m0.002s
+sys   0m0.003s
+
+$time ./sfrobs -f < test3.txt
+real  0m0.480s
+user  0m0.467s
+sys   0m0.019s
+
+===
+
+test4.txt
+$time ./sfrob < test4.txt (20000 lines)
+real  0m0.004s
+user  0m0.000s
+sys   0m0.002s
+
+$time ./sfrobu < test4.txt
+real  0m0.022s
+user  0m0.013s
+sys   0m0.005s
+
+$time ./sfrobs < test4.txt
+real  0m3.886s
+user  0m3.799s
+sys   0m0.068s
+
+$time ./sfrobu -f < test4.txt
+real  0m0.021s
+user  0m0.013s
+sys   0m0.005s
+
+$time ./sfrobs -f < test4.txt
+real  0m5.525s
+user  0m5.428s
+sys   0m0.075s
+
+Analysis:
+
+After using the time command to get the performances of sfrob, sfrobu, sfrobs, 
+sfrobu -f, and sfrobs -f, there were similar trends across the four test cases.
+
+First of all, when comparing the performances of sfrob and sfrobu, it was 
+clear that sfrob outperformed sfrobu in all three of the time categories. 
+As the number of input lines increased, the gap in performance between the two programs also widened. In addition, with regards to the sys time category, 
+it is of importance to note that the sfrob implementation was faster than 
+the sfrobu implementation due to the buffered vs. unbuffered I/O, and that 
+sfrobu required a significantly larger number of syscalls. This time 
+corresponds to the fact that sfrobu spends the correlating longer time in 
+the kernel vs. sfrob. 
+
+Next, in regards to the shell script sfrobs, it is clear that in all four 
+of the test cases (and in comparison to sfrob and sfrobu), it is significantly slower. This is due to the fact that sfrobs is a shell script, and runs in 
+bash. The reason that bash is slower in this case, is because of it being an interpreted language which is slower. Moreover, the sfrobs script uses 
+piping, which resulted in the slower time as well.
+
+Next, the sfrobu and sfrobu -f implementation yields results showing that the 
+implementations take a relatively similar amount of time to execute in my 
+four test cases. For the first two test cases, the times are nearly 
+identical, while in the third test case, the -f option was slightly slower,
+and lastly in the last test case, the -f option was slightly faster. 
+Adding the -f option, only resulted in one more comparison (i.e. tolower 
+in one function), and thus the times are largely similar.
+
+Finally, the sfrobs and sfrobs -f implementation show that the -f option is 
+slower in all four of the test cases. For the first test, the times are nearly identical. This is due to the fact that this test only consisted of an 
+input with 20 lines, and thus didn't have a huge impact on the performance difference. However, in the other three test cases, the -f option yielded a 
+much slower performance time than without it. This slower performance is due 
+the reasons already discussed, in that it is running in bash.Furthermore, 
+the -f option results in a certain number of potential functions and syscalls 
+that is larger than without it. As I didn't write the sort command program, I
+do not know the code to implement the -f option, but due to the sfrobs -f implementation yielding a much slower time, I would assume that it utilizes 
+a larger number of syscalls and overall functionality to implement.

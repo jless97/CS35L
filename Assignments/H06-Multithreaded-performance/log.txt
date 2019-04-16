@@ -1,0 +1,87 @@
+//CS 35L - Professor Eggert
+//Lab 4 - TA Isha Verma
+//Project 6 - Multithreaded Performance
+//Laboratory 
+//log.txt
+
+- To begin this lab, I signed onto the SEASNet Server via my terminal:
+
+$ ssh [username]@lnxsrv09.seas.ucla.edu
+[password]
+
+- Once on the SEASNet Server, I checked to make sure that the current version of GNU
+  sort was installed:
+
+$ which sort
+/usr/local/cs/bin/sort
+$ sort --version
+sort (GNU coreutils) 8.26
+
+- As the sort suffices, we geneate a file containing 10,000,000 random 
+  single-precision f.p. numbers in textual form, one per line with no white space. 
+  As it is single-precision, each consisting of 4 bytes, the number of total 
+  bytes to read in is 40,000,000
+- This was done using the od command, and using /dev/urandom for STDIN, with options
+  -t and -f to select the output format (which is floats), and the -N option to 
+  read in the bytes
+- Also, to have each f.p. on a separate line with no white spaces, tr and sed were
+  used:
+  - tr => to replace all spaces with a newline character 
+    - Used the -s option to replace all consecutive spaces with a single newline
+  - sed => to delete all of the blank lines 
+
+$ od -tf -N 40000000 < /dev/urandom | tr -s [:blank:] '\n' | sed ‘/^$/d' > large.txt
+
+- Now that I have the test data in a file, I use the time -p command to time the
+  command, sort -g on the data, with the output sent to /dev/null
+
+$ time -p sort -g large.txt > /dev/null
+real 19.72
+user 110.07
+sys 0.39
+
+- Now, same thing but run sort with --parallel option and -g option for 1, 2, 4, 
+  and 8 threads:
+
+Threads: 1
+$ time -p sort -g --parallel=1 large.txt > /dev/null
+real 100.46
+user 100.27
+sys 0.18
+
+Threads: 2
+$ time -p sort -g --parallel=2 large.txt > /dev/null
+real 56.64
+user 108.09
+sys 0.23
+
+Threads: 4
+$ time -p sort -g --parallel=4 large.txt > /dev/null
+real 32.30
+user 110.28
+sys 0.29
+
+Threads: 8
+$ time -p sort -g --parallel=8 large.txt > /dev/null
+real 20.32
+user 110.70
+sys 0.37
+
+Analysis:
+
+First of all, looking at the real time of the five recordings, it appears 
+that the general sort had a similar performance as that of the 8 threaded 
+version. However, for the sorts with 1, 2, and 4 threads, the performances 
+were much slower. Looking at the multithreaded sorts, it is observed that as 
+the number of threads increased, the real times decreased,which was to be 
+expected due to the enhanced parallelism being utilized. However, the user 
+times don't show any trend, and hover around the same time for all five 
+versions, including the sort with just -g. In regards to the sys times, there 
+is a linear trend showing that as the number of threads increased, the sys 
+time also increased. This was also to be expected, as if there are more threads
+running, there is bound to be more syscalls, and hence a higher sys time. 
+Comparing the sys time of the general sort with the 8 threaded sort, it is 
+clear that the times are very similar, and in fact, they are very similar for 
+all three of the times (real, user, and sys), which could hint at the fact 
+that the general sort is implemented in a similar way to the 8 threaded sort, 
+and is threaded in a similar fashion.

@@ -1,0 +1,188 @@
+//CS 35L, Lab 4 - Software Construction Laboratory
+//Name: Jason Less
+//Student ID: 404-640-158
+
+//Assignment 1. Getting to know your system
+//ans1.txt
+
+(1) Hint: man man
+
+By typing in man man into the terminal, an interface to the man reference
+manual was opened. From there, I scrolled down to the examples section where
+it listed common options used in correspondence with the man command. The
+desired options is the -k option, which allows one to print all of the 
+commands that have the specific keyword in their man page. The syntax for 
+this option => $ man -k [keyword].
+
+(2) Hint: which
+
+By using the which command in correspondence with the commands: cp and wc
+(i.e. $ which cp and $ which wc), it will show the full path of the given
+shell commands. In addition, I also used man for the exact definition of
+which to know fully of its capability.
+
+wc location => /usr/bin/wc
+cp location => /usr/bin/cp
+
+(3) Hint: find
+
+First of all, I looked up the man page for find, which had the following
+definition: search for files in a directory hierarchy. From lecture and using
+the hint provided, there is a use of find that is able to match a single 
+character to a filename or command (i.e. using the -name option and the “?”
+wildcard with the find command => $ find -name “?”). Initially, four 
+commands appeared: ., X, w, and [. However, after using the list command 
+to look at the given commands,it was found out that X was actually a 
+symbolic link, rather than an executable. In addition, using the help 
+command, I found that the . command executed commands from a file in 
+the current shell, but it wasn’t exactly an executable program. 
+
+Thus, it was found that the two executable programs that are a character 
+long are “[“, and “w”. This was tested by running them as executables 
+(i.e. $ ./[ and ./w, where “[“ requires some parameter inputs to run). 
+“[“ => Evaluates conditional expressions and 
+“w” => show who is logged on and what they are doing.
+
+(4) Hint: readlink
+
+I first looked up the man page for readlink and found that it prints the 
+resolved symbolic link or canonical file names. Knowing this, I navigated to
+the /usr/bin directory where the emacs executable is located. Next, I typed
+in $ readlink emacs, which in turn, printed out the file that is actually 
+executed => /etc/alternatives/emacs. 
+
+(5) Hint: man chmod 
+
+First, I looked up the man page for chmod to find out its exact definition, 
+as well as the group abbreviations and permissions. Chmod => change 
+file mode bits, while “s” sets the user or group ID on execution, and 
+“g” stands for the group members of the file. For g+s, it sets the 
+group ID, so that new files or subdirectories created in the given 
+directory will inherit the group ID. Thus, it preserves the directory’s 
+set-group-ID bits and permits the same permission to the group as the owner.
+For o-x,it takes the others who have access to the file and removes their 
+permission to execute.
+
+(6) Hint: man find
+
+I looked up the man page for find for the previous questions for this one as
+well. On the man page for find, I scrolled down to the Tests section, and 
+found an option called “ctime”, which would work in this case to search for
+files that have been modified in the last three weeks. Ctime would allow one
+to search for files whose status was last changed n * 24 hours ago. Thus, for
+files modified in the last three weeks (i.e. 21 days), n is equal to 21. 
+Therefore => $find -ctime -21 would work
+
+(7) Hint: find
+
+From question 6, I used find in correspondence with -ctime to search for the
+desired files. In addition, I used the -type option as well, as we are only
+looking for the directories modified in the last three weeks and not the
+files as well. When I searched in the home directory, there were 12
+directories that I modified in the last three weeks. The first directory 
+found to be modified in the last three weeks was the ‘.’ directory. The 
+other 11 directories modified were directories I created for this course
+to do this project.
+$ find -type d -ctime -21
+
+(8) Hint: whereis, man find
+
+First, I looked up the man page for whereis, whose description was found to
+be that it locates the binary, source, and manual page files for a command.
+Next, I used $ which find to find the full path of the find command. I then
+navigated to that such directory via $ cd /usr/bin. From there, I used the 
+find command in correspondence with the -type l option, which lists the 
+files that are symbolic links. Moreover, I used piping with the wc command, 
+which would list the number of symbolic links and print the number of 
+those such links. It was found that there are 294 symbolic links in the 
+same directory as find.
+$ find -type l | wc
+
+(9) Hint: find, sort
+
+First of all, I used the cd command to move into the /usr/lib directory.
+After, I used man ls to see what types of options that I could use that would
+not only list the files, but also would list them chronologically. These
+options were found to be -l and -t, where the latter sorts the files by the
+modification time. I then looked through the list to find the oldest regular
+file, which was found to be => libfreeblpriv3.so
+$ ls -lt
+
+(10) Hint: localedef
+
+I first looked up the man page for locale, but found that it had four pages
+corresponding to pages: 1, 1p, 5, and 7. The page I was looking for was
+on 1p whose definition was that it gets locale-specific information. From
+this man page, I scrolled down to the Description section, where it stated 
+that “it shall summarize the current locale environment … as determined by 
+the settings of the environment variables defined in the Base Definitions
+Volume of IEEE Std 1003.1-2001, Chapter 7, Locale.”
+$ man 1p locale
+
+
+(11) Hint: N/A
+
+To do this, I opened up emacs and then used the command C-h a [keyword], 
+which allows one to search for a command by keyword in the mini buffer.
+I searched with keyword sort, and found that there ten commands with sort in
+their name and these are: Buffer-menu-sort, sort-columns, sort-fields, 
+sort-times, sort-numeric-fields, sort-pages, sort-paragraphs, 
+sort-regexp-fields, tabulated-list-col-sort, and tabulated-list-sort.
+$ emacs
+C-h a sort
+C-M v => Used to scroll down in the mini buffer 
+
+(12) Hint: N/A
+
+To know what these commands do, I looked them up in the Emacs manual.
+
+The commands C-M-a, C-M-e, and C-M-h are commands that move point or set up
+the region based on top-level major definitions known as defuns. The commands
+C-M-b and C-M-f deal with balanced expressions referred to as sexp. 
+
+C-M-a => beginning-of-defun => Move to the beginning of the current or 
+	preceding defun 
+C-M-b => backward-sexp => Move backward over a sexp
+C-M-c => exit-recursive-edit => To exit a recursive edit
+C-M-d => down-list => Move down in the parentheses structure
+C-M-e => end-of-defun => Move to the end of the current or following defun
+C-M-f => forward-sexp => Move forward over a sexp
+C-M-h => mark-defun => Put region around whole current or following defun
+
+Note: There is no C-M-g as the M was accidentally discarded upon design, 
+yielding C-g
+
+(13) Hint: N/A
+
+C-g => keyboard-quit => it is the quit character that can stop a running
+command and also removes a partially typed command
+
+(14) Hint: N/A
+
+First of all, I used C-s yank in emacs to find what keystroke corresponded
+to the yank command. It was found that it was C-y, and its function is to 
+reinsert text that was previously killed into the buffer
+
+(15) Hint: N/A
+
+To do this, I first moved into the /usr/bin directory and used ls -l to see
+the full list. I then pulled up the output of the dired command directory 
+listing next to it by using C-x d. It was found that the tired command 
+directory listing had 88 more files than the output of the ls -l command. 
+The dired directory had 345912, while the ls -l command produced 345824.
+Two such examples of extra files in the dired command directory were found 
+at the very top of the list: 
+dr-xr-xr-x. 2 root root 81920 Jan 6 11:50 .
+drwxr-xr-x. 16 root root 4096 Dec 5 14:21 ..
+
+
+
+
+
+
+
+
+
+
+
+
