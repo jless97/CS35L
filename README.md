@@ -3,14 +3,6 @@
 ## Course Description
 Fundamentals of commonly used software tools and environments, particularly open-source tools to be used in upper-division computer science courses.
 
-### Languages Covered
-* OCaml
-* Java
-* Prolog
-* Scheme
-* Python
-* Kotlin
-
 ### Assignment Overviews
 * H1 (Emacs) - Getting to know your system
   * Learning to use Emacs
