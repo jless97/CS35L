@@ -12,17 +12,23 @@ Fundamentals of commonly used software tools and environments, particularly open
 * Kotlin
 
 ### Assignment Overviews
-* H1 (OCaml) - Fixpoints and grammar filters
-  * OCaml warmup -- writing simple functions on sets (e.g. subset, union, intersection, etc.)
-* H2 (OCaml) - Naive parsing of context-free grammars
-  * Simple parser generator of a context-free grammar
-* H3 (Java) - Java shared memory performance races
-  * Deep dive into multi-threading and synchronization issues in Java
-* H4 (Prolog) - Towers solver
-  * Solver of an arithmetical-logical puzzle known as Towers
-* H5 (Scheme) - Scheme code difference analyzer
-  * Generates diff summary given two pieces of text
-* Project (Python) - Proxy herd with asyncio
-  * Herd of servers that communicate amongst each other as well as a large number of clients asynchronously
-* H6 (Kotlin) - Language bindings for TensorFlow
-  * Comparison of Java, OCaml, and Kotlin in terms of programming flexibility, generality, performance, and reliability
+* H1 (Emacs) - Getting to know your system
+  * Learning to use Emacs
+* H2 (Bash) - Shell scripting
+  * Simple Bash scripts to do simple spell-checking and handling of duplicate files
+* H3 (Python) - Modifying and rewriting software
+  * Implementation of POSIX comm command
+* H4 (C) - C programming and debugging
+  * Implementation of simple patch file, C program that reads frobnicated text lines from STDIN and writes a sorted version to STDOUT in frobnicated form
+* H5 (C) - System call programming and debugging
+  * Implementation of buffered and unbuffered I/O, implementation of H4 C program using system callls instead of <stdio.h>
+* H6 - Multithreaded performance
+  * Multithreaded performance analysis, and modification of Brian Allen's simple ray tracer code to support multithreading to be run on a multicore machine
+* H7 - SSH setup and use in applications
+  * Deep dive of OpenSSH and GNU Privacy Guard
+* H8 - Dynamic linking
+  * Dividing an application into dynamically linked modules and a main program, so that the resulting executable doesn't need to load code that it doesn't need
+* H9 - Change management
+  * More stuff on patches
+* H10 - Research and development in computing
+  * Report and presentation on AI in the use of a selected video game (i.e. SSBM)
