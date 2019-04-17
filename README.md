@@ -1,4 +1,4 @@
-# CS35L - Software Construction Laboratory, Winter 2017
+# CS35L - Software Construction Laboratory, Winter 2017 
 
 ## Course Description
 Fundamentals of commonly used software tools and environments, particularly open-source tools to be used in upper-division computer science courses.
