@@ -3,6 +3,11 @@
 ## Course Description
 Fundamentals of commonly used software tools and environments, particularly open-source tools to be used in upper-division computer science courses.
 
+## Languages Used
+* Bash
+* Python
+* C
+
 ### Assignment Overviews
 * H1 (Emacs) - Getting to know your system
   * Learning to use Emacs
